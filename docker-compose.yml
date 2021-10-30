@@ -5,8 +5,6 @@ services:
     image: tutum/mongodb
     container_name: sales-db
     restart: always
-    networks:
-      - sales-network
     environment:
       - MONGODB_USER=admin
       - MONGODB_DATABASE=sales
@@ -19,8 +17,6 @@ services:
     image: postgres:11
     container_name: auth-db
     restart: always
-    networks:
-      - sales-network
     environment:
       - POSTGRES_DB=auth-db
       - POSTGRES_USER=admin
@@ -28,29 +24,46 @@ services:
     ports:
       - 5432:5432
 
-  sales_rabbit:
-    image: rabbitmq:3-management
-    container_name: sales_rabbit
-    hostname: sales_rabbit
-    networks:
-      - sales-network
-    ports:
-      - 5672:5672
-      - 25676:25676
-      - 15672:15672
+  auth-api:
+    build: './auth-api'
+    container_name: auth-api
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
-  
+      - PORT=8090
+    ports:
+      - 8090:8090
+
   product-db:
     image: postgres:11
     container_name: product-db
     restart: always
-    networks:
-      - sales-network
     environment:
       - POSTGRES_DB=product-db
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=123456
     ports:
       - 5433:5432
+
+  product-api:
+    build: './product-api'
+    container_name: product-api
+    environment:
+      - PORT=8081
+    ports:
+      - 8081:8081
+
+  sales-api:
+    build: './sales-api'
+    container_name: sales-api
+    environment:
+      - PORT=8083
+    ports:
+      - 8083:8083
+
+  sales_rabbit:
+    image: rabbitmq:3-management
+    container_name: sales_rabbit
+    ports:
+      - 5672:5672
+      - 25676:25676
+      - 15672:15672
+  
