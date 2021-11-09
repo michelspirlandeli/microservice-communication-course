@@ -7,9 +7,7 @@ class UserService {
           const { email } = req.params;
           this.validateRequestData(email);
           let user = await UserRepository.findByEmail(email);
-          if(!user){
-              
-          }
+          this.validateUserNotFound(user);
           return {
             status: httpStatus.SUCCESS,
             user: {
@@ -29,6 +27,12 @@ class UserService {
       validateRequestData(email) {
         if (!email) {
           throw new UserException("User email was not informed.");
+        }
+      }
+
+      validateUserNotFound(user) {
+        if (!user) {
+          throw new UserException(httpStatus.BAD_REQUEST, "User was not found.");
         }
       }
 }
